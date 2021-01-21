@@ -26,6 +26,7 @@ When serving resources from a network location using the NTFS file system, Apach
 mklink index:.jsp index.jsp
 ```
 给index.jsp创建一个带冒号的符号链接
+
 ![avatar](../../../images/java/tomcat/CVE-2021-24122/2.png)
 ![avatar](../../../images/java/tomcat/CVE-2021-24122/3.png)
 
@@ -35,11 +36,14 @@ mklink index:.jsp index.jsp
 
 ### 漏洞修复
 - https://github.com/apache/tomcat#diff-1496e8a847a9b5af77f7f2429ce0a4eaea6b373475885b176d56514b8a2f03e5
+
 ### 参考
 
 - https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-findfirstfilew
 
 - https://www.rapid7.com/db/vulnerabilities/apache-tomcat-cve-2021-24122/
+
+- https://www.jianshu.com/p/bb4412ef7c37
 
 - java.io.WinNTFileSystem.canonicalize.WinNTFileSystem.java
 
