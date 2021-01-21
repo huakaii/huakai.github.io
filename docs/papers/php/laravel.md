@@ -385,18 +385,3 @@ Content-Length: 235
 ![avatar](../../../images/php/laravel/CVE-2021-3129/18.png)
 
 
-
-
-
-
-<br>
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-
-
-
