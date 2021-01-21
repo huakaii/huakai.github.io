@@ -1,6 +1,6 @@
 <!-- _coverpage.md -->
 
-# vuln_paper
+# vuln paper
 
 > 全球鹰实验室技术文章沉淀
 
