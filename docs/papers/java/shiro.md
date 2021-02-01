@@ -1,6 +1,6 @@
 # Shiro漏洞分析合集
 
-## shiro ClassLoader 命令回显示
+## shiro ClassLoader 命令回显
 
 ### 靶场搭建
 
