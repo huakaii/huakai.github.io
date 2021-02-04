@@ -339,7 +339,7 @@ public boolean applyInContext(Context cx, Object input)
 
 在测试旧版本0.15.0的时候发现poc不通用，提示`[spec.ioConfig.firehose] is required`,查看对应代码
 ```java
-indexing-service/src/main/java/org/apache/druid/indexing/overlord/sampler/IndexTaskSamplerSpec.java
+//indexing-service/src/main/java/org/apache/druid/indexing/overlord/sampler/IndexTaskSamplerSpec.java
  @JsonCreator
   public IndexTaskSamplerSpec(
       @JsonProperty("spec") final IndexTask.IndexIngestionSpec ingestionSpec,
