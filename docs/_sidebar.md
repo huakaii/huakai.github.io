@@ -9,6 +9,7 @@
    - [Shiro](papers/java/shiro.md)
    - [Tomcat](papers/java/tomcat.md)
    - [ApacheFlink](papers/java/ApacheFlink.md)
+   - [Apache Druid](papers/java/ApacheDruid.md)
    - Weblogic
      - [CVE-2015-4852](papers/java/weblogic/CVE-2015-4852.md)
      - [CVE-2020-14841](papers/java/weblogic/CVE-2020-14841.md)
