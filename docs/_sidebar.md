@@ -6,7 +6,9 @@
    - [Lanproxy](papers/java/lanproxy.md)
    - [MessageSolution](papers/java/MessageSolution.md)
    - [Jackson](papers/java/jackson.md)
-   - [Shiro](papers/java/shiro.md)
+   - Shiro
+      - [Shiro命令回显](papers/java/shiro/shiro.md)
+      - [ShiroAuthBypass](papers/java/shiro/shiro_auth_bypass.md)
    - [Tomcat](papers/java/tomcat.md)
    - [ApacheFlink](papers/java/ApacheFlink.md)
    - [Apache Druid](papers/java/ApacheDruid.md)

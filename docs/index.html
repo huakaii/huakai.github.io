@@ -8,10 +8,14 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/vue.css">
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.css">
 </head>
 <body>
 <div id="app"></div>
+<script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 <script>
+	var num = 0;
+	mermaid.initialize({ startOnLoad: false });
     window.$docsify = {
         name: 'Vuln Paper',
         // loadNavbar: true,
@@ -29,6 +33,18 @@
             // '/.*/_sidebar.md': '/_sidebar.md',//防止意外回退
             '/.*/_navbar.md': '/_navbar.md'
         },
+		markdown: {
+		renderer: {
+		  code: function(code, lang) {
+			if (lang === "mermaid") {
+			  return (
+				'<div class="mermaid">' + mermaid.render('mermaid-svg-' + num++, code) + "</div>"
+			  );
+			}
+			return this.origin.code.apply(this, arguments);
+		  }
+		}
+	  }
     }
 </script>
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
