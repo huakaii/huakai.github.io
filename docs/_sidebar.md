@@ -14,6 +14,14 @@
    - [Apache Druid](papers/java/ApacheDruid.md)
    - Weblogic
      - [CVE-2015-4852](papers/java/weblogic/CVE-2015-4852.md)
+     - [CVE-2017-10271](papers/java/weblogic/CVE-2017-10271.md)
+	 - [CVE-2020-2883](papers/java/weblogic/CVE-2020-2883.md)
+     - [CVE-2019-2725](papers/java/weblogic/CVE-2019-2725.md)
+     - [CVE-2020-14645](papers/java/weblogic/CVE-2020-14645.md)
      - [CVE-2020-14841](papers/java/weblogic/CVE-2020-14841.md)
+     
 * Python漏洞
    - [JumpServer](papers/python/jumpserver.md)
+
+* 扫描器
+   - [基于语义分析的XSS检测](papers/scanner/XSS_Check_With_AST.md)
