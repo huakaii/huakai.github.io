@@ -22,6 +22,10 @@
      
 * Python漏洞
    - [JumpServer](papers/python/jumpserver.md)
-
+* 木马相关
+   - [BehinderShell](papers/shell/BehinderShell.md)
 * 扫描器
    - [基于语义分析的XSS检测](papers/scanner/XSS_Check_With_AST.md)
+
+* 渗透测试技术
+   - [跳出正则战场的waf bypass](papers/pentest/waf_bypass.md)
